@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Register | MoneyMind{% endblock %}
+{% block content %}
+
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+  }
+  .auth-box {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    padding: 2.5rem;
+  }
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .auth-logo i { font-size: 2.5rem; color: var(--primary); }
+  .auth-logo h1 { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; }
+  .auth-logo p { color: var(--gray); font-size: 0.9rem; margin-top: 0.25rem; }
+  .form-group { margin-bottom: 1.2rem; }
+  .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+  .form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--light-gray);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+    background: #fafafa;
+  }
+  .form-input:focus { border-color: var(--primary); background: white; }
+  .input-icon-wrap { position: relative; }
+  .input-icon-wrap i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--gray); font-size: 0.9rem; }
+  .input-icon-wrap .form-input { padding-left: 2.5rem; }
+  .password-hint { font-size: 0.78rem; color: var(--gray); margin-top: 0.3rem; }
+  .btn-auth {
+    width: 100%;
+    padding: 0.85rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 0.5rem;
+  }
+  .btn-auth:hover { opacity: 0.9; }
+  .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--gray); }
+  .auth-footer a { color: var(--primary); font-weight: 600; }
+  .alert {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .alert-danger { background: #ffe0e0; color: #b00020; border-left: 4px solid #e74c3c; }
+  .alert-success { background: #e0ffe6; color: #007e33; border-left: 4px solid #2ecc71; }
+</style>
+
+<div class="auth-box">
+  <div class="auth-logo">
+    <i class="fas fa-chart-line"></i>
+    <h1>MoneyMind</h1>
+    <p>Create your free account</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        <i class="fas fa-{% if category == 'danger' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('register') }}">
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <div class="input-icon-wrap">
+        <i class="fas fa-user"></i>
+        <input type="text" id="username" name="username" class="form-input" placeholder="Choose a username" required autocomplete="username">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <div class="input-icon-wrap">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" name="password" class="form-input" placeholder="Create a password" required autocomplete="new-password">
+      </div>
+      <p class="password-hint">Minimum 6 characters</p>
+    </div>
+    <button type="submit" class="btn-auth">
+      <i class="fas fa-user-plus"></i> Create Account
+    </button>
+  </form>
+
+  <div class="auth-footer">
+    Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+  </div>
+</div>
+{% endblock %}

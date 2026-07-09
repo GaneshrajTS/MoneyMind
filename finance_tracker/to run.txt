@@ -1,0 +1,3 @@
+go to /finance_tracker
+
+>python app.py

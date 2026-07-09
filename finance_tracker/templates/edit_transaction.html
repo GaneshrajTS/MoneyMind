@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Edit Transaction | MoneyMind{% endblock %}
+{% block content %}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --bg: #f5f7fb;
+    --light-gray: #e9ecef;
+    --gray: #6c757d;
+    --text: #2d2f36;
+    --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem;
+  }
+  .edit-card {
+    width: 100%; max-width: 560px;
+    background: white; border-radius: 16px;
+    box-shadow: var(--shadow); padding: 2.5rem;
+  }
+  .edit-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+  .edit-header .icon-circle {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(67,97,238,0.12);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary); font-size: 1.1rem;
+  }
+  .edit-header h2 { font-size: 1.4rem; font-weight: 700; color: var(--text); }
+  .edit-header p { font-size: 0.85rem; color: var(--gray); margin-top: 2px; }
+
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+  .form-input {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1.5px solid var(--light-gray);
+    border-radius: 10px; font-size: 0.95rem;
+    outline: none; transition: all 0.2s;
+    background: #fafafa; color: var(--text);
+  }
+  .form-input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(67,97,238,0.08); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .type-toggle { display: flex; gap: 0.75rem; margin-top: 0.4rem; }
+  .type-opt {
+    flex: 1; padding: 0.65rem;
+    border: 1.5px solid var(--light-gray);
+    border-radius: 10px; text-align: center;
+    cursor: pointer; font-size: 0.9rem; font-weight: 600;
+    transition: all 0.2s; position: relative;
+  }
+  .type-opt input { position: absolute; opacity: 0; }
+  .type-opt.expense-opt:has(input:checked) { border-color: var(--danger); background: #fff0f0; color: var(--danger); }
+  .type-opt.income-opt:has(input:checked) { border-color: var(--success); background: #f0fff4; color: var(--success); }
+  .type-opt:hover { border-color: var(--primary); }
+
+  .form-actions { display: flex; gap: 1rem; margin-top: 2rem; }
+  .btn {
+    flex: 1; padding: 0.85rem;
+    border: none; border-radius: 10px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none;
+  }
+  .btn-primary { background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-cancel { background: var(--light-gray); color: var(--text); }
+  .btn-cancel:hover { background: #d0d5dd; }
+
+  .alert {
+    padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem;
+    font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;
+  }
+  .alert-success { background: #e0ffe6; color: #007e33; border-left: 4px solid #2ecc71; }
+  .alert-danger { background: #ffe0e0; color: #b00020; border-left: 4px solid #e74c3c; }
+
+  .tx-id-badge {
+    display: inline-block; background: rgba(67,97,238,0.1);
+    color: var(--primary); font-size: 0.75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 1.5rem;
+  }
+</style>
+
+<div class="edit-card">
+  <div class="edit-header">
+    <div class="icon-circle"><i class="fas fa-edit"></i></div>
+    <div>
+      <h2>Edit Transaction</h2>
+      <p>Modify the transaction details below</p>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        <i class="fas fa-{% if category == 'success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="tx-id-badge">Transaction #{{ tx['id'] }}</div>
+
+  <form method="POST" action="{{ url_for('edit_transaction', id=tx['id']) }}">
+    <input type="hidden" name="id" value="{{ tx['id'] }}">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-input" value="{{ tx['date'] }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (₹)</label>
+        <input type="number" step="0.01" name="amount" class="form-input"
+               value="{{ tx['amount'] }}" placeholder="0.00" min="0" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input type="text" name="description" class="form-input"
+             value="{{ tx['description'] or '' }}" placeholder="What was this for?">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select name="category" class="form-input">
+        {% for cat in ['Food', 'Transport', 'Shopping', 'Entertainment', 'Utilities', 'Healthcare', 'Salary', 'Other'] %}
+          <option value="{{ cat }}" {% if tx['category'] == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <div class="type-toggle">
+        <label class="type-opt expense-opt">
+          <input type="radio" name="type" value="expense" {% if tx['type'] == 'expense' %}checked{% endif %}>
+          <i class="fas fa-arrow-down"></i> Expense
+        </label>
+        <label class="type-opt income-opt">
+          <input type="radio" name="type" value="income" {% if tx['type'] == 'income' %}checked{% endif %}>
+          <i class="fas fa-arrow-up"></i> Income
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('transactions_page') }}" class="btn btn-cancel">
+        <i class="fas fa-times"></i> Cancel
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Update Transaction
+      </button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

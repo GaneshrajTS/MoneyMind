@@ -1,0 +1,10 @@
+flask
+flask-login
+werkzeug
+numpy
+pandas
+tensorflow
+statsmodels
+scikit-learn
+scipy
+anvil-uplink
