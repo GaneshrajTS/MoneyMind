@@ -8,3 +8,4 @@ statsmodels
 scikit-learn
 scipy
 anvil-uplink
+gunicorn
